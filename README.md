@@ -256,7 +256,7 @@ the supporting services. Do not run it when local data must be retained.
 After Docker reports the supporting services as healthy, start the application from IntelliJ IDEA:
 
 1. Open **Run > Edit Configurations**.
-2. Select the shared **BankServiceApplication (local)** Spring Boot configuration.
+2. Select the shared **SimpleBankingService (Local Testing)** Spring Boot configuration.
 3. Run or debug the configuration.
 
 The shared configuration is stored at

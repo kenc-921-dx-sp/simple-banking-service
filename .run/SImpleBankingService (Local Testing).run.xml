@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="BankServiceApplication (local)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+  <configuration default="false" name="SimpleBankingService (Local Testing)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="local" />
     <module name="simple-banking-service" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.kenc921.dxsp.simple_banking_service.BankingServiceApplication" />
