@@ -162,3 +162,26 @@ authorization.
 - Keep entity-to-schema changes aligned with Liquibase migrations because Hibernate validation is
   configured with `ddl-auto: validate`.
 
+## Local DB Query
+
+To explore database records locally, access pgAdmin at `http://localhost:5050` and execute the
+helper queries stored under [testing_tools/sql](../testing_tools/sql).
+
+### pgAdmin Credentials
+
+| Field | Value |
+| --- | --- |
+| Username | `admin@banking.local.com` |
+| Password | `admin` |
+
+### SQL Helper Scripts
+
+| Script | Location | Usage |
+| --- | --- | --- |
+| `customer_bank_accounts.sql` | [testing_tools/sql/customer_bank_accounts.sql](../testing_tools/sql/customer_bank_accounts.sql) | Lists each customer together with the bank accounts owned by that customer. Use this when you want to inspect IBANs, account aliases, supported currencies, and the customer record behind an account. |
+| `customer_transactions.sql` | [testing_tools/sql/customer_transactions.sql](../testing_tools/sql/customer_transactions.sql) | Shows the transaction history for the sample customer reference `P-0123456789`. Use this when you want to inspect transaction direction, amount, currency, value date, and description for the seeded data set. |
+| `distinct_role_privilege.sql` | [testing_tools/sql/distinct_role_privilege.sql](../testing_tools/sql/distinct_role_privilege.sql) | Lists the role-to-privilege pairs currently stored in the authorization tables. Use this when you want to verify the database-backed security model. |
+
+The scripts are read-only inspection helpers. They are useful for validating seeded data, checking
+entity relationships after local startup, and confirming that the Liquibase state matches the JPA
+model.
