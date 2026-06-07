@@ -32,6 +32,7 @@ The transaction domain is described in detail in the
 | Document | Purpose |
 | --- | --- |
 | [Business Requirements](documentations/requirements.md) | Original business requirements and expected deliverables |
+| [Database Entities](documentations/database_entities.md) | Shared JPA entities, relationships, and persistence usage |
 | [Transactions Module](documentations/transactions_module.md) | Detailed ingestion and listing implementation |
 | [Kafka Transaction Ingestion](documentations/kafka_transaction_ingestion.md) | Kafka payloads, publishing, and dead-letter behavior |
 | [JWT Authentication](documentations/jwt_authentication.md) | Authentication, authorization, and mock tokens |
@@ -40,7 +41,31 @@ The transaction domain is described in detail in the
 | [Container Deployment](documentations/container_deployment.md) | Concise container and deployment reference |
 | [Work Breakdown Structure](documentations/wbs.md) | Project task and delivery breakdown |
 
-## 1. Authentication and Authorization
+## 1. Data Model
+
+The banking service stores its core business state in a small set of shared JPA entities under
+`src/main/java/com/kenc921/dxsp/simple_banking_service/data`.
+
+- `Customer` is the root identity record and the owner of accounts, roles, and transaction
+  history.
+- `CustomerBankAccount` stores each IBAN, its alias, and the set of supported currencies.
+- `CustomerBankAccountTransaction` stores the persisted transaction ledger rows used by both
+  ingestion and reporting.
+- `CustomerRole` and `CustomerPrivilege` hold the database-backed authorization model used by JWT
+  authentication.
+
+The relationships are:
+
+- one customer owns many bank accounts
+- one customer owns many transactions through account ownership
+- one customer can have many roles
+- one role can grant many privileges
+- one account can have many transactions
+
+For the full entity summary and relation diagram, see
+[Database Entities](documentations/database_entities.md).
+
+## 2. Authentication and Authorization
 
 The service operates as an OAuth 2.0 resource server. Clients call protected APIs with an
 RSA-signed JWT:
@@ -70,7 +95,7 @@ not be reused in a production environment.
 For the complete authentication flow, token claims, mock JWT generation, and failure behavior, see
 [JWT Authentication](documentations/jwt_authentication.md).
 
-## 2. Transactions Module
+## 3. Transactions Module
 
 The transactions module implements the application's primary business capability. It is divided
 into two workflows:
@@ -99,7 +124,7 @@ src/main/java/com/kenc921/dxsp/simple_banking_service/data
 See [Transactions Module](documentations/transactions_module.md) for service flows, sequence
 diagrams, persistence behavior, currency conversion, and requirement traceability.
 
-### 2.1 Transaction Ingestion
+### 3.1 Transaction Ingestion
 
 `BankTransactionKafkaListener` consumes raw JSON records from the configured Kafka source topic.
 The raw value is retained so that invalid messages can be logged and republished unchanged to the
@@ -132,7 +157,7 @@ Dead letter: account-transactions-dlq
 Payload examples and Kafka UI publishing instructions are available in
 [Kafka Transaction Ingestion](documentations/kafka_transaction_ingestion.md).
 
-### 2.2 Transaction Listing API
+### 3.2 Transaction Listing API
 
 The historical transaction API is exposed as:
 
@@ -176,7 +201,7 @@ provider authentication, timeout, retry, caching, and failure-handling policies.
 Detailed controller, service, repository, mapping, and aggregation behavior is documented in
 [Paginated Transaction Listing](documentations/transactions_module.md#2-paginated-transaction-listing).
 
-## 3. Data and Database Migrations
+## 4. Data and Database Migrations
 
 PostgreSQL stores customers, accounts, authorization data, and transaction history. Hibernate is
 configured with `ddl-auto: validate`; it validates entity-to-schema compatibility but does not
@@ -216,7 +241,7 @@ guidance, and official references, see
 [Liquibase Database Migrations](documentations/liquibase_database_migrations.md). Repository-level
 conventions are also defined in [AGENTS.md](AGENTS.md#liquibase-conventions).
 
-## 4. Local Development
+## 5. Local Development
 
 Reset the local Docker environment before starting development:
 
@@ -255,7 +280,7 @@ For a complete Docker-based workflow, including image construction, Compose netw
 generation, Postman testing, and environment variables, see
 [Docker & Deployment Related](documentations/docker_and_deployment_related.md).
 
-## 5. Build and Verification
+## 6. Build and Verification
 
 For a fast local artifact build without running tests:
 
@@ -276,7 +301,7 @@ Before review, merge, or release, run:
 `verify` executes the configured tests and Maven lifecycle checks. Skipping tests should be limited
 to cases where a fast packaging result is explicitly required.
 
-## 6. Deployment
+## 7. Deployment
 
 > **Work in progress:** The deployment resources are an initial technical baseline and are not
 > production-ready. They may require changes before they run in a specific Kubernetes or OpenShift
