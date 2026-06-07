@@ -121,11 +121,11 @@ The resulting image is tagged `banking-service:local`.
 The existing `docker-compose.yml` provides PostgreSQL, pgAdmin, Kafka, ZooKeeper, Kafka UI, and a
 Kafka topic initialization container. It does not run the banking service application.
 
-Set a predictable Compose project name and start the supporting services:
+Start the supporting services from the repository root:
 
 ```bash
-COMPOSE_PROJECT_NAME=banking-service docker compose up -d
-COMPOSE_PROJECT_NAME=banking-service docker compose ps
+docker compose up -d
+docker compose ps
 ```
 
 Wait until PostgreSQL and Kafka report healthy. The supporting interfaces are:
@@ -139,13 +139,21 @@ Wait until PostgreSQL and Kafka report healthy. The supporting interfaces are:
 
 ### 3.2 Run the Application Image
 
-For a local container test, connect the application to the Compose network and activate the
-`local` Spring profile:
+For a local container test, attach the application container to the Compose network created by
+`docker-compose.yml`. Docker Compose names that network `<repository-directory>_default`. When the
+repository is checked out as `simple-banking-service`, the network is
+`simple-banking-service_default`.
+
+On that network, PostgreSQL and Kafka are reachable by their Compose service names (`postgres` and
+`kafka`). Without `--network`, those hostnames do not resolve and Liquibase cannot connect to the
+database.
+
+Activate the `local` Spring profile and connect to the existing Compose network:
 
 ```bash
 docker run --rm \
   --name banking-service \
-  --network banking-service_default \
+  --network simple-banking-service_default \
   -p 8080:8080 \
   -e SPRING_PROFILES_ACTIVE=local \
   -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/banking_db \
@@ -156,6 +164,14 @@ docker run --rm \
   -e BANKING_SERVICE_KAFKA_ENABLED=true \
   banking-service:local
 ```
+
+If the repository directory name differs, identify the Compose network with:
+
+```bash
+docker network ls
+```
+
+Use the matching `<directory>_default` network in the `docker run --network` argument.
 
 The internal Kafka address is `kafka:29092`. Port `9092` is the broker address advertised to
 processes running on the host, while containers on the Compose network should use the internal
@@ -169,14 +185,6 @@ Activating `local` has three relevant effects:
 - The development RSA key pair is available for local JWT signing and validation.
 
 These behaviors are development conveniences and must not be enabled in production.
-
-If the Compose network has a different name, identify it with:
-
-```bash
-docker network ls
-```
-
-Use the matching Compose network in the `docker run --network` argument.
 
 ### 3.3 Confirm Application Health
 
@@ -254,7 +262,7 @@ curl \
 To stop and remove the local supporting services and their persisted volumes:
 
 ```bash
-COMPOSE_PROJECT_NAME=banking-service docker compose down --volumes --remove-orphans
+docker compose down --volumes --remove-orphans
 ```
 
 ## 4. Kubernetes and OpenShift Deployment
