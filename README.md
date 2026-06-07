@@ -246,10 +246,12 @@ conventions are also defined in [AGENTS.md](AGENTS.md#liquibase-conventions).
 Reset the local Docker environment before starting development:
 
 ```bash
-docker compose down --volumes --remove-orphans && docker compose up -d
+docker compose down --volumes --remove-orphans
+docker volume prune --all
+docker compose up -d
 ```
 
-This command is copied from `testing_tools/reset_docker_command.txt`. It deletes the local
+It deletes the local
 PostgreSQL and pgAdmin volumes, including all locally persisted database state, and then recreates
 the supporting services. Do not run it when local data must be retained.
 

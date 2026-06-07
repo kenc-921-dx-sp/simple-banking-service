@@ -3,9 +3,9 @@
 
 ## DB Setup
 - Design DB schema with the following table:
-1. user
-2. bank_account
-3. bank_account_transaction
+1. customer
+2. customer_bank_account
+3. customer_bank_account_transaction
 
 - Prepare liquibase migration script
 - Prepare entity classes
@@ -17,25 +17,20 @@
 - add spring config
 - create java event listener
 
-## Redis setup
-- pom
-- yml config
-- handle rate for testing
-
 ## Java service classes creation 
 - Create the following classes under config package:
   - HttpSecurityConfig
 - Create the following classes under controller package:
-    - TransactionController
+    - CustomerBankAccountTransactionController
 - Create the following classes under service package:
-    - TransactionService
-    - RateService
+    - CustomerBankAccountTransactionService
+    - QuoteService
 - Create the following classes under repository package:
-    - TransactionRepository
+    - CustomerBankAccountTransactionRepository
 - Create the following classes under event package:
     - HttpSecurityConfig
 - Create the following classes under config package:
-    - TransactionEventListener
+    - BankTransactionKafkaListener
 
 ## API related
 - Define request & response format
@@ -44,7 +39,7 @@
 
 
 ## Security
-- Handle HTTP security config to allow extraction of User ID from JWT
+- Handle HTTP security config to allow extraction of Customer ID from JWT
 
 
 
