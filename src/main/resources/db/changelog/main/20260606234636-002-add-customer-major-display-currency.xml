@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        logicalFilePath="db/changelog/main/002-add-customer-major-display-currency.xml">
+
+    <changeSet id="002-add-customer-major-display-currency" author="codex">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists
+                        tableName="customer"
+                        columnName="major_display_currency"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="customer">
+            <column name="major_display_currency" type="varchar(3)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        logicalFilePath="db/changelog/main/003-add-customer-authorization.xml">
+
+    <changeSet id="003-1-create-customer-authorization-tables" author="codex">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="customer_role"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="customer_role">
+            <column name="id" type="int" autoIncrement="true" startWith="2">
+                <constraints primaryKey="true" primaryKeyName="pk_customer_role" nullable="false"/>
+            </column>
+            <column name="role_name" type="varchar(100)">
+                <constraints nullable="false" unique="true"
+                             uniqueConstraintName="uk_customer_role_role_name"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="customer_privilege">
+            <column name="id" type="int" autoIncrement="true" startWith="2">
+                <constraints primaryKey="true" primaryKeyName="pk_customer_privilege" nullable="false"/>
+            </column>
+            <column name="privilege_name" type="varchar(100)">
+                <constraints nullable="false" unique="true"
+                             uniqueConstraintName="uk_customer_privilege_privilege_name"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="customer_customer_role">
+            <column name="customer_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customer_role_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="customer_customer_role"
+                       columnNames="customer_id, customer_role_id"
+                       constraintName="pk_customer_customer_role"/>
+        <addForeignKeyConstraint
+                baseTableName="customer_customer_role"
+                baseColumnNames="customer_id"
+                referencedTableName="customer"
+                referencedColumnNames="id"
+                constraintName="fk_customer_customer_role_customer"/>
+        <addForeignKeyConstraint
+                baseTableName="customer_customer_role"
+                baseColumnNames="customer_role_id"
+                referencedTableName="customer_role"
+                referencedColumnNames="id"
+                constraintName="fk_customer_customer_role_role"/>
+        <createIndex tableName="customer_customer_role"
+                     indexName="idx_customer_customer_role_role">
+            <column name="customer_role_id"/>
+        </createIndex>
+
+        <createTable tableName="customer_role_customer_privilege">
+            <column name="customer_role_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customer_privilege_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="customer_role_customer_privilege"
+                       columnNames="customer_role_id, customer_privilege_id"
+                       constraintName="pk_customer_role_customer_privilege"/>
+        <addForeignKeyConstraint
+                baseTableName="customer_role_customer_privilege"
+                baseColumnNames="customer_role_id"
+                referencedTableName="customer_role"
+                referencedColumnNames="id"
+                constraintName="fk_customer_role_privilege_role"/>
+        <addForeignKeyConstraint
+                baseTableName="customer_role_customer_privilege"
+                baseColumnNames="customer_privilege_id"
+                referencedTableName="customer_privilege"
+                referencedColumnNames="id"
+                constraintName="fk_customer_role_privilege_privilege"/>
+        <createIndex tableName="customer_role_customer_privilege"
+                     indexName="idx_customer_role_privilege_privilege">
+            <column name="customer_privilege_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="003-2-customer-view-only-role-setup" author="codex">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="customer_role"/>
+                <tableExists tableName="customer_privilege"/>
+                <tableExists tableName="customer_customer_role"/>
+                <tableExists tableName="customer_role_customer_privilege"/>
+            </and>
+        </preConditions>
+
+        <insert tableName="customer_role">
+            <column name="id" valueNumeric="1"/>
+            <column name="role_name" value="VIEW_ONLY"/>
+        </insert>
+        <insert tableName="customer_privilege">
+            <column name="id" valueNumeric="1"/>
+            <column name="privilege_name" value="transactions:view"/>
+        </insert>
+        <insert tableName="customer_role_customer_privilege">
+            <column name="customer_role_id" valueNumeric="1"/>
+            <column name="customer_privilege_id" valueNumeric="1"/>
+        </insert>
+        <sql>
+            INSERT INTO customer_customer_role (customer_id, customer_role_id)
+            SELECT id, 1 FROM customer
+            ON CONFLICT DO NOTHING
+        </sql>
+    </changeSet>
+</databaseChangeLog>

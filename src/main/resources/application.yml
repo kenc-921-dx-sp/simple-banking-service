@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: banking-service
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        transaction.jta.platform: org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform
+        jdbc:
+          time_zone: UTC
+  liquibase:
+    change-log: db/changelog/db.changelog-master.xml
+    contexts:
+      - main
+  lifecycle:
+    timeout-per-shutdown-phase: 25s
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+        add-additional-paths: true
+
+server:
+  shutdown: graceful
+
+logging:
+  level:
+    org.hibernate.orm.core: WARN
+
+banking-service:
+  security:
+    ## configure keys for each environment
+    jwt:
+      public-key:
+      private-key:
+  transactions:
+    system-default-major-display-currency: USD
+    kafka:
+      topic: account-transactions
+      dead-letter-topic: account-transactions-dlq
+  kafka:
+    enabled: false

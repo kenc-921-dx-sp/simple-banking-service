@@ -1,0 +1,16 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: banking-service
+  labels:
+    app.kubernetes.io/name: banking-service
+spec:
+  to:
+    kind: Service
+    name: banking-service
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        logicalFilePath="db/changelog/main/001-create-data-entities.xml">
+
+    <changeSet id="001-create-data-entities" author="codex">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="customer"/>
+            </not>
+        </preConditions>
+        <createTable tableName="customer">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" primaryKeyName="pk_customer" nullable="false"/>
+            </column>
+            <column name="customer_reference" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customer_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="customer_bank_account">
+            <column name="iban" type="varchar(255)">
+                <constraints primaryKey="true" primaryKeyName="pk_customer_bank_account" nullable="false"/>
+            </column>
+            <column name="customer_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_alias" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_currencies" type="varchar(3) ARRAY">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="customer_bank_account_transaction">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true"
+                             primaryKeyName="pk_customer_bank_account_transaction"
+                             nullable="false"/>
+            </column>
+            <column name="customer_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_iban" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="decimal">
+                <constraints nullable="false"/>
+            </column>
+            <column name="currency" type="varchar(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value_date" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)"/>
+            <column name="created_at" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_direction" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                tableName="customer"
+                columnNames="customer_reference"
+                constraintName="uk_customer_customer_reference"/>
+
+        <addForeignKeyConstraint
+                baseTableName="customer_bank_account"
+                baseColumnNames="customer_id"
+                referencedTableName="customer"
+                referencedColumnNames="id"
+                constraintName="fk_customer_bank_account_customer"/>
+
+        <addForeignKeyConstraint
+                baseTableName="customer_bank_account_transaction"
+                baseColumnNames="customer_id"
+                referencedTableName="customer"
+                referencedColumnNames="id"
+                constraintName="fk_customer_bank_account_transaction_customer"/>
+
+        <addForeignKeyConstraint
+                baseTableName="customer_bank_account_transaction"
+                baseColumnNames="account_iban"
+                referencedTableName="customer_bank_account"
+                referencedColumnNames="iban"
+                constraintName="fk_customer_bank_account_transaction_account"/>
+    </changeSet>
+</databaseChangeLog>
