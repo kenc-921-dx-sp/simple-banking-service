@@ -24,6 +24,10 @@ The implementation uses:
 - Springdoc OpenAPI for API schema generation and local Swagger UI.
 - Docker, Kubernetes, and OpenShift resources for packaging and deployment preparation.
 
+High level architecture of **Simple Banking Service**:
+
+![High level architecture](documentations/images/sbs_high_level_structure.png)
+
 The transaction domain is described in detail in the
 [Transactions Module documentation](documentations/transactions_module.md).
 
