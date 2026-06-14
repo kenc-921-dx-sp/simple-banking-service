@@ -65,7 +65,7 @@ public class CustomerBankAccountTransactionController {
           @Min(1)
           int size,
       @Parameter(description = "ISO 4217 currency used for display values", example = "USD")
-          @RequestParam
+          @RequestParam(required = false)
           @Pattern(regexp = "[A-Z]{3}")
           String majorDisplayCurrency) {
     YearMonth yearMonth = YearMonth.of(year, month);

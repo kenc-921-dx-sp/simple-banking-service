@@ -46,7 +46,7 @@ public class CustomerBankAccountTransactionService {
 
     Page<CustomerBankAccountTransaction> customerBankAccountTransactions =
         customerBankAccountTransactionRepository
-            .findCustomerBankAccountTranscationByCustomerIdAndValueDateRange(
+            .findCustomerBankAccountTransactionByCustomerIdAndValueDateRange(
                 customerId, queryStartDate, queryEndDate, pageable);
 
     Set<String> distinctTransactionCurrencies =

@@ -34,7 +34,7 @@ public interface CustomerBankAccountTransactionRepository
 					  and transaction.valueDate <= :queryEndDate
 					""")
   Page<CustomerBankAccountTransaction>
-      findCustomerBankAccountTranscationByCustomerIdAndValueDateRange(
+      findCustomerBankAccountTransactionByCustomerIdAndValueDateRange(
           @Param("customerId") UUID customerId,
           @Param("queryStartDate") OffsetDateTime queryStartDate,
           @Param("queryEndDate") OffsetDateTime queryEndDate,
